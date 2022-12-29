@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# drop the file under: /etc/update-motd.d/
+# make it executable: chmod +x <filename>
+
