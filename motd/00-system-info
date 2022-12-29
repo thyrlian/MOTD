@@ -3,3 +3,109 @@
 # drop the file under: /etc/update-motd.d/
 # make it executable: chmod +x <filename>
 
+#!/bin/sh
+
+# date and time now
+date=`date`
+
+# OS version
+[ -r /etc/lsb-release ] && . /etc/lsb-release
+if [ -z "$DISTRIB_DESCRIPTION" ] && [ -x /usr/bin/lsb_release ]; then
+	# Fall back to using the very slow lsb_release utility
+	DISTRIB_DESCRIPTION=$(lsb_release -s -d)
+fi
+os=`printf "%s (%s %s %s)\n" "$DISTRIB_DESCRIPTION" "$(uname -o)" "$(uname -r)" "$(uname -m)"`
+
+# Model name
+if [ -d /system/app/ ] && [ -d /system/priv-app ]; then
+    model="$(getprop ro.product.brand) $(getprop ro.product.model)"
+elif [ -f /sys/devices/virtual/dmi/id/board_vendor ] || [ -f /sys/devices/virtual/dmi/id/board_name ] || [ -f /sys/devices/virtual/dmi/id/product_name ]; then
+    model=`cat /sys/devices/virtual/dmi/id/board_vendor`
+    model="$model $(cat /sys/devices/virtual/dmi/id/product_name)"
+    model="$model $(cat /sys/devices/virtual/dmi/id/board_name)"
+elif [ -f /sys/firmware/devicetree/base/model ]; then
+    model=`cat /sys/firmware/devicetree/base/model`
+elif [ -f /tmp/sysinfo/model ]; then
+    model=`cat /tmp/sysinfo/model`
+fi
+
+# CPU load
+cpu_load=`cat /proc/loadavg | awk '{print $1*100 "%"}'`
+
+# Memory used
+memory_usage=`free -m | awk '($1=="Mem:"){memTotal=$2} ($2=="buffers/cache:"){memUsed=$3} END{printf "%.1f%%", memUsed/memTotal * 100}'`
+
+# Swap memory used
+swap_usage=`free -m | awk '($1=="Swap:"){swapTotal=$2; swapUsed=$3} END{printf "%.1f%%", swapUsed/swapTotal * 100}'`
+
+# Disk space used
+disk_usage=`df -h | awk '{if($(NF) == "/") {print $(NF-1); exit;}}'`
+
+# Number of open user sessions
+user_sessions=`users | wc -l`
+
+# Number of running processes
+running_processes=`ps aux | wc -l`
+
+# IP address
+used_ip=`ifconfig enp1s0 | grep "inet " | grep -E "([0-9]{1,3}\.){3}[0-9]{1,3}" | awk '{ print $2 }'`
+
+# System uptime
+# uptime=`uptime | awk '{print $3 " " $4}' | sed s'/.$//'`
+if [ -r /proc/uptime ]; then
+    time=`cat /proc/uptime | awk '{ gsub("\..*", "", $1); print $1 }'`
+else
+    boot=$(date -d"$(uptime -s)" +%s)
+    now=$(date +%s)
+    time=$((now - boot))
+fi
+
+d="$((time / 60 / 60 / 24)) days"
+h="$((time / 60 / 60 % 24)) hours"
+m="$((time / 60 % 60)) minutes"
+
+uptime=${d:+$d, }${h:+$h, }$m
+uptime=${uptime%', '}
+uptime=${uptime:-$time seconds}
+
+# Make the output of uptime smaller.
+case $uptime_shorthand in
+    on)
+        uptime=${uptime/ minutes/ mins}
+        uptime=${uptime/ minute/ min}
+        uptime=${uptime/ seconds/ secs}
+    ;;
+
+    tiny)
+        uptime=${uptime/ days/d}
+        uptime=${uptime/ day/d}
+        uptime=${uptime/ hours/h}
+        uptime=${uptime/ hour/h}
+        uptime=${uptime/ minutes/m}
+        uptime=${uptime/ minute/m}
+        uptime=${uptime/ seconds/time}
+        uptime=${uptime//,}
+    ;;
+esac
+
+COLOR_DEFAULT="\033[0m"
+COLOR_HEADER="\033[0;33m"
+COLOR_LINE="\033[0;44m"
+COLOR_FIELD="\033[0;37m"
+COLOR_VALUE="\033[0;36m"
+
+printf "${COLOR_HEADER}⚙ Sys Info ⚙\n"
+printf "${COLOR_HEADER}${date}\n"
+printf "${COLOR_LINE}--------------------------------------------------\n"
+printf "${COLOR_FIELD}OS                :${COLOR_VALUE} %s\n" "${os}"
+printf "${COLOR_FIELD}Model             :${COLOR_VALUE} %s\n" "${model}"
+printf "${COLOR_FIELD}CPU Usage         :${COLOR_VALUE} %s\n" "${cpu_load}"
+printf "${COLOR_FIELD}Memory Usage      :${COLOR_VALUE} %s\n" "${memory_usage}"
+printf "${COLOR_FIELD}Swap Usage        :${COLOR_VALUE} %s\n" "${swap_usage}"
+printf "${COLOR_FIELD}Disk Usage        :${COLOR_VALUE} %s\n" "${disk_usage}"
+printf "${COLOR_FIELD}Open Sessions     :${COLOR_VALUE} %s\n" "${user_sessions}"
+printf "${COLOR_FIELD}Running Processes :${COLOR_VALUE} %s\n" "${running_processes}"
+printf "${COLOR_FIELD}IP Address        :${COLOR_VALUE} %s\n" "${used_ip}"
+printf "${COLOR_FIELD}Uptime            :${COLOR_VALUE} %s\n" "${uptime}"
+printf "${COLOR_LINE}--------------------------------------------------\n"
+printf "${COLOR_DEFAULT}"
