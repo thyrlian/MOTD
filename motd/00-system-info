@@ -35,9 +35,6 @@ cpu_load=`cat /proc/loadavg | awk '{print $1*100 "%"}'`
 # Memory used
 memory_usage=`free -m | awk '($1=="Mem:"){memTotal=$2} ($2=="buffers/cache:"){memUsed=$3} END{printf "%.1f%%", memUsed/memTotal * 100}'`
 
-# Swap memory used
-swap_usage=`free -m | awk '($1=="Swap:"){swapTotal=$2; swapUsed=$3} END{printf "%.1f%%", swapUsed/swapTotal * 100}'`
-
 # Disk space used
 disk_usage=`df -h | awk '{if($(NF) == "/") {print $(NF-1); exit;}}'`
 
@@ -125,7 +122,6 @@ printf "${COLOR_FIELD}OS                :${COLOR_VALUE} %s\n" "${os}"
 printf "${COLOR_FIELD}Model             :${COLOR_VALUE} %s\n" "${model}"
 printf "${COLOR_FIELD}CPU Usage         :${COLOR_VALUE} %s\n" "${cpu_load}"
 printf "${COLOR_FIELD}Memory Usage      :${COLOR_VALUE} %s\n" "${memory_usage}"
-printf "${COLOR_FIELD}Swap Usage        :${COLOR_VALUE} %s\n" "${swap_usage}"
 printf "${COLOR_FIELD}Disk Usage        :${COLOR_VALUE} %s\n" "${disk_usage}"
 printf "${COLOR_FIELD}Open Sessions     :${COLOR_VALUE} %s\n" "${user_sessions}"
 printf "${COLOR_FIELD}Running Processes :${COLOR_VALUE} %s\n" "${running_processes}"
