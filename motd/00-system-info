@@ -60,9 +60,33 @@ else
     time=$((now - boot))
 fi
 
-d="$((time / 60 / 60 / 24)) days"
-h="$((time / 60 / 60 % 24)) hours"
-m="$((time / 60 % 60)) minutes"
+d="$((time / 60 / 60 / 24))"
+h="$((time / 60 / 60 % 24))"
+m="$((time / 60 % 60))"
+
+if [ $d -gt 1 ]; then
+    d="$d days"
+elif [ $d -eq 1 ]; then
+    d="$d day"
+elif [ $d -eq 0 ]; then
+    unset d
+fi
+
+if [ $h -gt 1 ]; then
+    h="$h hours"
+elif [ $h -eq 1 ]; then
+    h="$h hour"
+elif [ $h -eq 0 ]; then
+    unset h
+fi
+
+if [ $m -gt 1 ]; then
+    m="$m minutes"
+elif [ $m -eq 1 ]; then
+    m="$m minute"
+elif [ $m -eq 0 ]; then
+    unset m
+fi
 
 uptime=${d:+$d, }${h:+$h, }$m
 uptime=${uptime%', '}
