@@ -20,9 +20,8 @@ os=`printf "%s (%s %s %s)\n" "$DISTRIB_DESCRIPTION" "$(uname -o)" "$(uname -r)" 
 if [ -d /system/app/ ] && [ -d /system/priv-app ]; then
     model="$(getprop ro.product.brand) $(getprop ro.product.model)"
 elif [ -f /sys/devices/virtual/dmi/id/board_vendor ] || [ -f /sys/devices/virtual/dmi/id/board_name ] || [ -f /sys/devices/virtual/dmi/id/product_name ]; then
-    model=`cat /sys/devices/virtual/dmi/id/board_vendor`
-    model="$model $(cat /sys/devices/virtual/dmi/id/product_name)"
-    model="$model $(cat /sys/devices/virtual/dmi/id/board_name)"
+    model_dir="/sys/devices/virtual/dmi/id"
+    model="$(cat $model_dir/board_vendor) $(cat $model_dir/product_name) ($(cat $model_dir/board_name))"
 elif [ -f /sys/firmware/devicetree/base/model ]; then
     model=`cat /sys/firmware/devicetree/base/model`
 elif [ -f /tmp/sysinfo/model ]; then
