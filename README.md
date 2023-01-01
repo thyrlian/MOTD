@@ -26,3 +26,12 @@ echo -en "\033[1;32m" | sudo tee /etc/motd
 sudo cat /etc/motd_text | sudo tee -a /etc/motd
 echo -en "\033[0m" | sudo tee -a /etc/motd
 ```
+
+To disable last login info
+```bash
+# put the below configuration into /etc/ssh/sshd_config
+PrintLastLog no
+
+# restart SSH service
+sudo systemctl restart sshd
+```
