@@ -38,7 +38,7 @@ if [ -f /proc/meminfo ]; then
     mem_available="$((mem_available / (1024 * 1024)))"
     mem_total="$((mem_total / (1024 * 1024)))"
     mem_percent="$((mem_used * 100 / mem_total))"
-    memory_usage="${mem_used}/${mem_total} GB (${mem_percent}%)"
+    memory_usage="${mem_percent}% (${mem_used}/${mem_total} GB)"
 else
     memory_usage=`free -m | awk '($1=="Mem:"){mem_total=$2} ($2=="buffers/cache:"){mem_used=$3} END{printf "%.1f%%", mem_used/mem_total * 100}'`
 fi
