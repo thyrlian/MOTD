@@ -72,3 +72,10 @@ PrintLastLog no
 # restart SSH service
 sudo systemctl restart sshd
 ```
+
+## References
+
+* [ASCII Generator](http://www.network-science.de/ascii/)
+* [ANSI color escape code](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
+* [Dynamic login messages with update-motd](https://fishi.devtail.io/weblog/2015/02/06/dyamic-login-messages-update-motd/)
+* [neofetch](https://github.com/dylanaraps/neofetch) - A command-line system information tool written in bash
