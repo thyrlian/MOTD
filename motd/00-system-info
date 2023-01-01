@@ -3,8 +3,6 @@
 # drop the file under: /etc/update-motd.d/
 # make it executable: chmod +x <filename>
 
-#!/bin/sh
-
 # date and time now
 date=`date`
 
