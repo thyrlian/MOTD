@@ -28,6 +28,7 @@ fi
 
 # CPU load
 cpu_load=`cat /proc/loadavg | awk '{print $1*100 "%"}'`
+cpu_load="$cpu_load ($(lscpu | sed -nr '/Model name/ s/.*:\s*(.*)/\1/p'))"
 
 # Memory used
 if [ -f /proc/meminfo ]; then
